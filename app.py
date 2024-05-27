@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask import request
 import pickle
 
@@ -22,6 +22,13 @@ def predict():
         predictions = model.predict(tokenized_note)
         predictions = 1 if predictions == 1 else -1
         return render_template('home.html', text=text, predictions=predictions)
+@app.route('/api/predict', methods=['POST'])
+def api_predict():
+        text=request.get_json(force=True)
+        tokenized_note = tokenizer.transform([text])  # Note: Wrap text in a list
+        predictions = model.predict(tokenized_note)
+        predictions = 1 if predictions == 1 else -1
+        return jsonify( {'predictions': predictions, 'text': text})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
